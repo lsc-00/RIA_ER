@@ -1,1 +1,43 @@
+#flet 설치
+pip install flet==0.83.0
 
+
+#sdk문제, build 폴더 생성해서 cmake
+mkdir build
+cd build
+
+# 1. 빌드 환경 구성
+cmake ..
+
+# 2. 컴파일 시작 (CPU 코어를 모두 사용하여 빠르게 빌드)
+make -j$(nproc)
+
+# 3. build 폴더 안에서 .so 파일의 위치 검색
+cd ~/Elite_Robots_CS_SDK_Python/build
+find . -name "elite_cs_sdk_python*"
+
+# 4. 빌드된 .so 파일을 소스 패키지 폴더로 복사
+cp ~/Elite_Robots_CS_SDK_Python/build/python/package/elite_cs_sdk/elite_cs_sdk_python.so ~/Elite_Robots_CS_SDK_Python/src/python/package/elite_cs_sdk/
+
+#5. libelite-cs-series-sdk.so 파일이 빌드 폴더 어디에 있는지 확인합니다.
+find ~/Elite_Robots_CS_SDK_Python/build -name "libelite-cs-series-sdk.so"
+
+#6.라이브러리 파일을 시스템 경로로 복사
+#가장 최신 파일이 들어있는 package 폴더 내의 파일을 시스템 라이브러리 폴더로 복사합니다.
+sudo cp /home/$USERS$/Elite_Robots_CS_SDK_Python/build/python/package/elite_cs_sdk/libelite-cs-series-sdk.so /usr/local/lib/
+
+#7.시스템 라이브러리 목록 갱신 복사만 한다고 끝나는 게 아니라, 리눅스에게 "새로운 라이브러리가 왔으니 목록을 업#데이트해라"라고 명령을 내려야 합니다.
+sudo ldconfig
+
+# ===============================안 될 경우=======================================#
+cd ~/Elite_Robots_CS_SDK_Python/examples
+
+# 기존에 잘못된 링크가 있다면 삭제
+rm -rf elite_cs_sdk
+
+# 실제 패키지 폴더를 현재 폴더로 연결 (심볼릭 링크 생성)
+ln -s ../src/python/package/elite_cs_sdk elite_cs_sdk
+
+
+# PYTHONPATH 환경 변수 추가 
+export PYTHONPATH=$PYTHONPATH:~/Elite_Robots_CS_SDK_Python/src/python/package
